@@ -1,14 +1,6 @@
-<!DOCTYPE html>
-
-<html>
-  <head>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-
-  <body>
-    <!-- the entire body must be written by student -->
-    <form>
-      <label for="fontsize">Font Size:</label>
+<body>
+    <form id="preference-form">
+      <label for="fontsize">Font Size (8-72px):</label>
       <input
         type="number"
         id="fontsize"
@@ -19,11 +11,25 @@
       />
       <br />
       <label for="fontcolor">Font Color:</label>
-      <input type="color" id="fontcolor" name="fontcolor" value="#000000" />
+      <input 
+        type="color" 
+        id="fontcolor" 
+        name="fontcolor" 
+        value="#000000" 
+      />
       <br />
-      <input type="submit" value="Save" />
+      <input type="submit" value="Save" id="save-btn" />
     </form>
-
+    
+    <hr />
+    
+    <h1>Customizable Font Example</h1>
+    <p>
+      This paragraph demonstrates how the font size and color preferences, 
+      saved in cookies, persist across page reloads. Adjust the settings 
+      above and click "Save" to see the changes applied immediately and upon 
+      your next visit!
+    </p>
+    
     <script type="text/javascript" src="./script.js"></script>
-  </body>
-</html>
+</body>
