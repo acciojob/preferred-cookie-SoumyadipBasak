@@ -87,7 +87,6 @@ function handleSave(event) {
     const color = fontcolorInput.value;
 
     // 1. Save preferences to cookies (valid for 30 days for persistence)
-    // The cookies are named 'fontsize' and 'fontcolor' as required.
     setCookie('fontsize', size, 30);
     setCookie('fontcolor', color, 30);
 
@@ -103,7 +102,6 @@ function handleSave(event) {
 // --- 3. Initialization ---
 
 // 4️⃣ On Page Load: Apply any existing cookies first
-// This must run immediately when the script loads to apply saved settings from previous visits.
 applyPreferences(); 
 
 // Attach event listener to the form submission
