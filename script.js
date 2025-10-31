@@ -2,87 +2,94 @@
 // 🌐 APP LOGIC (Runs in Browser)
 // ==============================
 
-// --- Cookie Utilities ---
-function setCookie(name, value, days = 7) {
+// --- Cookie utilities ---
+function setCookie(name, value, days = 30) {
   const date = new Date();
-  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${name}=${value}; expires=${date.toUTCString()}; path=/`;
+  date.setTime(date.getTime() + days*24*60*60*1000);
+  document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; path=/; expires=${date.toUTCString()}`;
 }
 
 function getCookie(name) {
-  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-  return match ? match[2] : null;
+  const nameEQ = encodeURIComponent(name) + "=";
+  const cookies = document.cookie.split(";");
+  for (let c of cookies) {
+    c = c.trim();
+    if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length));
+  }
+  return null;
 }
 
-// --- Apply styles from cookies ---
-function applyStyles() {
-  const fontSize = getCookie("fontsize");
-  const fontColor = getCookie("fontcolor");
+// --- Apply preferences to page ---
+function applyPreferences() {
+  const size = getCookie("fontsize");
+  const color = getCookie("fontcolor");
 
-  if (fontSize) document.body.style.fontSize = fontSize + "px";
-  if (fontColor) document.body.style.color = fontColor;
+  if (size) document.documentElement.style.setProperty("--fontsize", size + "px");
+  if (color) document.documentElement.style.setProperty("--fontcolor", color);
 }
 
-// --- On Page Load ---
-window.addEventListener("load", () => {
-  applyStyles();
+// Apply preferences as early as possible
+applyPreferences();
 
-  const form = document.getElementById("settingsForm");
-  const fontSizeInput = document.getElementById("fontsize");
-  const fontColorInput = document.getElementById("fontcolor");
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("preference-form");
+  const sizeInput = document.getElementById("fontsize");
+  const colorInput = document.getElementById("fontcolor");
 
-  if (!form || !fontSizeInput || !fontColorInput) return;
+  if (!form || !sizeInput || !colorInput) return;
 
-  // Save cookies on form submit
+  // Update input values from cookies
+  if (getCookie("fontsize")) sizeInput.value = getCookie("fontsize");
+  if (getCookie("fontcolor")) colorInput.value = getCookie("fontcolor");
+
+  // Save preferences on submit
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const size = fontSizeInput.value;
-    const color = fontColorInput.value;
-    setCookie("fontsize", size);
-    setCookie("fontcolor", color);
-    applyStyles();
+    const size = sizeInput.value;
+    const color = colorInput.value;
+    setCookie("fontsize", size, 30);
+    setCookie("fontcolor", color, 30);
+
+    document.documentElement.style.setProperty("--fontsize", size + "px");
+    document.documentElement.style.setProperty("--fontcolor", color);
+
+    alert("Preferences saved!");
   });
 
   // Real-time updates
-  fontSizeInput.addEventListener("change", (e) => {
-    setCookie("fontsize", e.target.value);
-    applyStyles();
+  sizeInput.addEventListener("change", (e) => {
+    setCookie("fontsize", e.target.value, 30);
+    document.documentElement.style.setProperty("--fontsize", e.target.value + "px");
   });
 
-  fontColorInput.addEventListener("change", (e) => {
-    setCookie("fontcolor", e.target.value);
-    applyStyles();
+  colorInput.addEventListener("change", (e) => {
+    setCookie("fontcolor", e.target.value, 30);
+    document.documentElement.style.setProperty("--fontcolor", e.target.value);
   });
 });
 
 // ==============================
-// 🧪 CYPRESS TEST (Runs in Cypress Only)
+// 🧪 CYPRESS TEST (Runs Only in Cypress)
 // ==============================
 if (typeof describe !== "undefined") {
   describe("Font customization test", () => {
-    const baseUrl = "http://localhost:3000"; // Change if your server runs elsewhere
+    const baseUrl = "http://localhost:3000"; // adjust if needed
 
     it("should save and apply font size and color from cookies", () => {
       cy.visit(baseUrl + "/main.html");
 
-      // Update font size and color
       cy.get("#fontsize").clear().type("18").trigger("change");
-      cy.get("#fontcolor").invoke("val", "#ff0000").trigger("change");
+      cy.get("#fontcolor").invoke("val", "#ff0000").trigger("input");
 
-      // Submit the form
-      cy.get('input[type="submit"]').click();
+      cy.get("input[type='submit']").click();
 
-      // Ensure cookies are created
-      cy.getCookie("fontcolor").should("exist");
+      // Check cookies exist
       cy.getCookie("fontsize").should("exist");
+      cy.getCookie("fontcolor").should("exist");
 
-      // Reload to test persistence
       cy.reload();
+      cy.wait(500); // wait for JS to reapply cookies
 
-      // Wait for cookie reapplication
-      cy.wait(500);
-
-      // Validate applied CSS
       cy.get("body")
         .should("have.css", "font-size")
         .and("match", /18px|18\.0px/);
