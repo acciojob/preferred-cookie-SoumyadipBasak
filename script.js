@@ -2,14 +2,13 @@
 
 /**
  * Reads a specific cookie value. Corrected to be robust against whitespace and encoding issues.
- * This ensures the '18' font size value is retrieved correctly after page reload.
- * * @param {string} name - The name of the cookie to retrieve.
+ * @param {string} name - The name of the cookie to retrieve.
  * @returns {string | null} The cookie value, or null if not found.
  */
 function getCookie(name) {
     // Encodes name for safe comparison and sets the required prefix
     const nameEQ = encodeURIComponent(name) + "=";
-    // Splits all cookies and trims whitespace from each part (crucial for reliability)
+    // Splits all cookies and trims whitespace from each part (Crucial for fix)
     const cookies = document.cookie.split(';');
     
     for(let i = 0; i < cookies.length; i++) {
@@ -25,7 +24,7 @@ function getCookie(name) {
 
 /**
  * Sets a cookie with a specific name and value.
- * * @param {string} name - The name of the cookie.
+ * @param {string} name - The name of the cookie.
  * @param {string} value - The value to store.
  * @param {number} days - The number of days until the cookie expires.
  */
@@ -43,6 +42,8 @@ function setCookie(name, value, days) {
 // --- 2. Preference Application and Saving ---
 
 const root = document.documentElement; // Get the :root element for CSS variables
+// Note: When placing the script in the <head>, these elements will exist 
+// because the browser processes the HTML structure even before full content load.
 const form = document.getElementById('preference-form');
 const fontsizeInput = document.getElementById('fontsize');
 const fontcolorInput = document.getElementById('fontcolor');
@@ -78,7 +79,7 @@ function applyPreferences() {
 /**
  * 3️⃣ Saving User Preferences
  * Handles the form submission to save preferences to cookies.
- * * @param {Event} event - The form submission event.
+ * @param {Event} event - The form submission event.
  */
 function handleSave(event) {
     event.preventDefault(); // Prevent the default form submission (page reload)
@@ -102,7 +103,7 @@ function handleSave(event) {
 
 // --- 3. Initialization ---
 
-// 4️⃣ On Page Load: Apply any existing cookies first. This is crucial for persistence.
+// 4️⃣ On Page Load: Apply any existing cookies first. This must run early.
 applyPreferences(); 
 
 // Attach event listener to the form submission
