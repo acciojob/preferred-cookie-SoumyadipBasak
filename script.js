@@ -1,22 +1,21 @@
-// --- 1. Cookie Management Utility Functions (Provided) ---
+// --- 1. Cookie Management Utility Functions ---
 
 /**
- * Reads a specific cookie value.
+ * Reads a specific cookie value using split/trim.
  * @param {string} name - The name of the cookie to retrieve.
  * @returns {string | null} The cookie value, or null if not found.
  */
 function getCookie(name) {
-    // Escape the name to use it in the regex
-    const nameEQ = name + "=";
-    // Split all cookies into an array
-    const ca = document.cookie.split(';');
-    for(let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        // Remove leading spaces
-        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-        // Check if this is the target cookie
-        if (c.indexOf(nameEQ) === 0) {
-            return c.substring(nameEQ.length, c.length);
+    // Encodes name for safe comparison and sets the required prefix
+    const nameEQ = encodeURIComponent(name) + "=";
+    // Splits all cookies and trims whitespace from each part
+    const cookies = document.cookie.split(';');
+    
+    for(let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i].trim();
+        if (cookie.indexOf(nameEQ) === 0) {
+            // Returns the value, decoding it from URI encoding
+            return decodeURIComponent(cookie.substring(nameEQ.length)); 
         }
     }
     return null;
@@ -35,8 +34,8 @@ function setCookie(name, value, days) {
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
         expires = "; expires=" + date.toUTCString();
     }
-    // Set the cookie (valid for 30 days)
-    document.cookie = name + "=" + value + expires + "; path=/";
+    // Encode the value and set the cookie (valid for 30 days)
+    document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
 }
 
 // --- 2. Preference Application and Saving ---
@@ -50,7 +49,6 @@ const fontcolorInput = document.getElementById('fontcolor');
 /**
  * 4️⃣ Automatically Apply Preferences on Page Load
  * Reads cookies and applies the preferences to CSS variables.
- * Also updates the form inputs to reflect the saved state.
  */
 function applyPreferences() {
     const savedSize = getCookie('fontsize');
@@ -62,7 +60,6 @@ function applyPreferences() {
         root.style.setProperty('--fontsize', savedSize + 'px'); 
         // Update the form input to show the saved value
         fontsizeInput.value = savedSize; 
-        console.log(`Applying saved font size: ${savedSize}px`);
     }
 
     // Apply font color if cookie exists
@@ -71,7 +68,6 @@ function applyPreferences() {
         root.style.setProperty('--fontcolor', savedColor);
         // Update the form input to show the saved value
         fontcolorInput.value = savedColor;
-        console.log(`Applying saved font color: ${savedColor}`);
     }
 }
 
@@ -87,12 +83,9 @@ function handleSave(event) {
     // Get validated values from inputs
     const size = fontsizeInput.value;
     const color = fontcolorInput.value;
-    
-    // The requirement specifies the cookies should store:
-    // fontsize: value (in px) -> size (e.g., "20")
-    // fontcolor: value (in hex) -> color (e.g., "#ff0000")
 
     // 1. Save preferences to cookies (valid for 30 days for persistence)
+    // The value stored is the raw size (e.g., "18") and raw hex color (e.g., "#ff0000")
     setCookie('fontsize', size, 30);
     setCookie('fontcolor', color, 30);
 
@@ -108,7 +101,7 @@ function handleSave(event) {
 // --- 3. Initialization ---
 
 // 4️⃣ On Page Load: Apply any existing cookies first
-// This ensures that saved preferences are applied immediately when the page loads.
+// This must run immediately when the script loads to apply saved settings.
 applyPreferences(); 
 
 // Attach event listener to the form submission

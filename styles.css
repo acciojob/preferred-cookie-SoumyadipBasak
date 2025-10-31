@@ -13,7 +13,7 @@ body {
     /* Apply the styles using the CSS variables */
     font-size: var(--fontsize);
     color: var(--fontcolor);
-    transition: all 0.3s ease; /* Optional: smooth transition for UX */
+    transition: all 0.3s ease; 
 }
 
 /* Basic form styling for clarity */
