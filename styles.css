@@ -1,4 +1,5 @@
 :root {
+    /* Default font values */
     --fontsize: 16px;
     --fontcolor: #000000;
 }
@@ -8,6 +9,7 @@ body {
     padding: 20px;
     max-width: 800px;
     margin: 0 auto;
+
     font-size: var(--fontsize);
     color: var(--fontcolor);
     transition: all 0.3s ease;

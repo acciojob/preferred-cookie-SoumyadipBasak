@@ -7,7 +7,7 @@
  */
 function getCookie(name) {
     const nameEQ = encodeURIComponent(name) + "=";
-    const cookies = document.cookie.split(';');
+    const cookies = document.cookie.split(";");
     for (let c of cookies) {
         c = c.trim();
         if (c.indexOf(nameEQ) === 0) {
@@ -27,10 +27,15 @@ function setCookie(name, value, days) {
     let expires = "";
     if (days) {
         const date = new Date();
-        date.setTime(date.getTime() + (days * 86400000)); // 24h * 60m * 60s * 1000ms
+        date.setTime(date.getTime() + days * 86400000);
         expires = "; expires=" + date.toUTCString();
     }
-    document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+    document.cookie =
+        encodeURIComponent(name) +
+        "=" +
+        encodeURIComponent(value) +
+        expires +
+        "; path=/";
 }
 
 // -------------------- PREFERENCE HANDLING --------------------
@@ -44,16 +49,21 @@ function applyPreferences() {
     const savedSize = getCookie("fontsize");
     const savedColor = getCookie("fontcolor");
 
-    if (savedSize) root.style.setProperty("--fontsize", savedSize + "px");
-    if (savedColor) root.style.setProperty("--fontcolor", savedColor);
+    // Apply font size (ensure 'px' suffix)
+    if (savedSize) {
+        root.style.setProperty("--fontsize", savedSize);
+    }
+    // Apply font color
+    if (savedColor) {
+        root.style.setProperty("--fontcolor", savedColor);
+    }
 
-    // Update form fields if they exist (after DOM is ready)
-    if (document.getElementById("fontsize")) {
-        document.getElementById("fontsize").value = savedSize || 16;
-    }
-    if (document.getElementById("fontcolor")) {
-        document.getElementById("fontcolor").value = savedColor || "#000000";
-    }
+    // Update form fields (if DOM ready)
+    const sizeInput = document.getElementById("fontsize");
+    const colorInput = document.getElementById("fontcolor");
+
+    if (sizeInput) sizeInput.value = parseInt(savedSize) || 16;
+    if (colorInput) colorInput.value = savedColor || "#000000";
 }
 
 /**
@@ -65,24 +75,24 @@ function handleSave(event) {
     const size = document.getElementById("fontsize").value;
     const color = document.getElementById("fontcolor").value;
 
-    setCookie("fontsize", size, 30);
+    // Save preferences as cookies (with px unit)
+    setCookie("fontsize", size + "px", 30);
     setCookie("fontcolor", color, 30);
 
-    // Apply changes immediately
+    // Apply immediately
     root.style.setProperty("--fontsize", size + "px");
     root.style.setProperty("--fontcolor", color);
 
-    alert("✅ Preferences saved successfully! Reload the page to verify persistence.");
-    console.log(`Saved: fontsize=${size}px, fontcolor=${color}`);
+    alert("✅ Preferences saved successfully!");
+    console.log(`Saved fontsize=${size}px, color=${color}`);
 }
 
 // -------------------- INITIALIZATION --------------------
 
-// Apply immediately (so visual flash doesn’t occur)
+// Apply immediately (so it works even before DOM loads fully)
 applyPreferences();
 
-// Initialize after DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("preference-form");
-    form.addEventListener("submit", handleSave);
+    if (form) form.addEventListener("submit", handleSave);
 });
