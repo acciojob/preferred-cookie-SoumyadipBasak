@@ -1,7 +1,7 @@
 // --- 1. Cookie Management Utility Functions ---
 
 /**
- * Reads a specific cookie value using split/trim.
+ * Reads a specific cookie value. Corrected to be robust against whitespace and encoding issues.
  * @param {string} name - The name of the cookie to retrieve.
  * @returns {string | null} The cookie value, or null if not found.
  */
@@ -13,6 +13,7 @@ function getCookie(name) {
     
     for(let i = 0; i < cookies.length; i++) {
         let cookie = cookies[i].trim();
+        // Check if this cookie starts with the target name
         if (cookie.indexOf(nameEQ) === 0) {
             // Returns the value, decoding it from URI encoding
             return decodeURIComponent(cookie.substring(nameEQ.length)); 
@@ -34,7 +35,7 @@ function setCookie(name, value, days) {
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
         expires = "; expires=" + date.toUTCString();
     }
-    // Encode the value and set the cookie (valid for 30 days)
+    // Encode the name and value and set the cookie (valid for 30 days)
     document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
 }
 
@@ -49,6 +50,7 @@ const fontcolorInput = document.getElementById('fontcolor');
 /**
  * 4️⃣ Automatically Apply Preferences on Page Load
  * Reads cookies and applies the preferences to CSS variables.
+ * Also updates the form inputs to reflect the saved state.
  */
 function applyPreferences() {
     const savedSize = getCookie('fontsize');
@@ -85,11 +87,11 @@ function handleSave(event) {
     const color = fontcolorInput.value;
 
     // 1. Save preferences to cookies (valid for 30 days for persistence)
-    // The value stored is the raw size (e.g., "18") and raw hex color (e.g., "#ff0000")
+    // The cookies are named 'fontsize' and 'fontcolor' as required.
     setCookie('fontsize', size, 30);
     setCookie('fontcolor', color, 30);
 
-    // 2. Apply the changes immediately to the page for good UX
+    // 2. Apply the changes immediately to the page for good User Experience (UX)
     root.style.setProperty('--fontsize', size + 'px');
     root.style.setProperty('--fontcolor', color);
 
@@ -101,7 +103,7 @@ function handleSave(event) {
 // --- 3. Initialization ---
 
 // 4️⃣ On Page Load: Apply any existing cookies first
-// This must run immediately when the script loads to apply saved settings.
+// This must run immediately when the script loads to apply saved settings from previous visits.
 applyPreferences(); 
 
 // Attach event listener to the form submission
