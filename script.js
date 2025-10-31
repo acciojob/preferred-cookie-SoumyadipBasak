@@ -1,4 +1,4 @@
-// --- 1. Cookie Management Utility Functions ---
+// --- 1. Cookie Management Utility Functions (Provided) ---
 
 /**
  * Reads a specific cookie value.
@@ -50,6 +50,7 @@ const fontcolorInput = document.getElementById('fontcolor');
 /**
  * 4️⃣ Automatically Apply Preferences on Page Load
  * Reads cookies and applies the preferences to CSS variables.
+ * Also updates the form inputs to reflect the saved state.
  */
 function applyPreferences() {
     const savedSize = getCookie('fontsize');
@@ -57,16 +58,20 @@ function applyPreferences() {
 
     // Apply font size if cookie exists
     if (savedSize) {
-        root.style.setProperty('--fontsize', savedSize + 'px');
+        // Set the CSS variable (needs 'px' unit)
+        root.style.setProperty('--fontsize', savedSize + 'px'); 
         // Update the form input to show the saved value
         fontsizeInput.value = savedSize; 
+        console.log(`Applying saved font size: ${savedSize}px`);
     }
 
     // Apply font color if cookie exists
     if (savedColor) {
+        // Set the CSS variable
         root.style.setProperty('--fontcolor', savedColor);
         // Update the form input to show the saved value
         fontcolorInput.value = savedColor;
+        console.log(`Applying saved font color: ${savedColor}`);
     }
 }
 
@@ -82,12 +87,16 @@ function handleSave(event) {
     // Get validated values from inputs
     const size = fontsizeInput.value;
     const color = fontcolorInput.value;
+    
+    // The requirement specifies the cookies should store:
+    // fontsize: value (in px) -> size (e.g., "20")
+    // fontcolor: value (in hex) -> color (e.g., "#ff0000")
 
     // 1. Save preferences to cookies (valid for 30 days for persistence)
     setCookie('fontsize', size, 30);
     setCookie('fontcolor', color, 30);
 
-    // 2. Apply the changes immediately to the page (optional, but good UX)
+    // 2. Apply the changes immediately to the page for good UX
     root.style.setProperty('--fontsize', size + 'px');
     root.style.setProperty('--fontcolor', color);
 
@@ -99,6 +108,7 @@ function handleSave(event) {
 // --- 3. Initialization ---
 
 // 4️⃣ On Page Load: Apply any existing cookies first
+// This ensures that saved preferences are applied immediately when the page loads.
 applyPreferences(); 
 
 // Attach event listener to the form submission

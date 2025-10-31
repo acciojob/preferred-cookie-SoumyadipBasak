@@ -1,16 +1,53 @@
 :root {
-  /* Default values, these will be overwritten by JavaScript if cookies exist */
-  --fontsize: 16px;
-  --fontcolor: #000000;
+    /* Default values, these will be overwritten by JavaScript if cookies exist */
+    --fontsize: 16px;
+    --fontcolor: #000000;
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
-  
-  /* Apply the styles using the CSS variables */
-  font-size: var(--fontsize);
-  color: var(--fontcolor);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    
+    /* Apply the styles using the CSS variables */
+    font-size: var(--fontsize);
+    color: var(--fontcolor);
+    transition: all 0.3s ease; /* Optional: smooth transition for UX */
+}
+
+/* Basic form styling for clarity */
+#preference-form {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+
+label {
+    display: inline-block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+input[type="number"], input[type="color"] {
+    margin-left: 10px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+input[type="submit"] {
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
 }
