@@ -2,13 +2,14 @@
 
 /**
  * Reads a specific cookie value. Corrected to be robust against whitespace and encoding issues.
- * @param {string} name - The name of the cookie to retrieve.
+ * This ensures the '18' font size value is retrieved correctly after page reload.
+ * * @param {string} name - The name of the cookie to retrieve.
  * @returns {string | null} The cookie value, or null if not found.
  */
 function getCookie(name) {
     // Encodes name for safe comparison and sets the required prefix
     const nameEQ = encodeURIComponent(name) + "=";
-    // Splits all cookies and trims whitespace from each part
+    // Splits all cookies and trims whitespace from each part (crucial for reliability)
     const cookies = document.cookie.split(';');
     
     for(let i = 0; i < cookies.length; i++) {
@@ -24,7 +25,7 @@ function getCookie(name) {
 
 /**
  * Sets a cookie with a specific name and value.
- * @param {string} name - The name of the cookie.
+ * * @param {string} name - The name of the cookie.
  * @param {string} value - The value to store.
  * @param {number} days - The number of days until the cookie expires.
  */
@@ -77,7 +78,7 @@ function applyPreferences() {
 /**
  * 3️⃣ Saving User Preferences
  * Handles the form submission to save preferences to cookies.
- * @param {Event} event - The form submission event.
+ * * @param {Event} event - The form submission event.
  */
 function handleSave(event) {
     event.preventDefault(); // Prevent the default form submission (page reload)
@@ -101,7 +102,7 @@ function handleSave(event) {
 
 // --- 3. Initialization ---
 
-// 4️⃣ On Page Load: Apply any existing cookies first
+// 4️⃣ On Page Load: Apply any existing cookies first. This is crucial for persistence.
 applyPreferences(); 
 
 // Attach event listener to the form submission
