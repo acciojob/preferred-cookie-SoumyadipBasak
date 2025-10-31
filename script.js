@@ -1,21 +1,17 @@
 // --- 1. Cookie Management Utility Functions ---
 
 /**
- * Reads a specific cookie value. Corrected to be robust against whitespace and encoding issues.
+ * Reads a specific cookie value.
  * @param {string} name - The name of the cookie to retrieve.
  * @returns {string | null} The cookie value, or null if not found.
  */
 function getCookie(name) {
-    // Encodes name for safe comparison and sets the required prefix
     const nameEQ = encodeURIComponent(name) + "=";
-    // Splits all cookies and trims whitespace from each part (Crucial for fix)
     const cookies = document.cookie.split(';');
     
     for(let i = 0; i < cookies.length; i++) {
         let cookie = cookies[i].trim();
-        // Check if this cookie starts with the target name
         if (cookie.indexOf(nameEQ) === 0) {
-            // Returns the value, decoding it from URI encoding
             return decodeURIComponent(cookie.substring(nameEQ.length)); 
         }
     }
@@ -35,18 +31,15 @@ function setCookie(name, value, days) {
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
         expires = "; expires=" + date.toUTCString();
     }
-    // Encode the name and value and set the cookie (valid for 30 days)
     document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
 }
 
 // --- 2. Preference Application and Saving ---
 
 const root = document.documentElement; // Get the :root element for CSS variables
-// Note: When placing the script in the <head>, these elements will exist 
-// because the browser processes the HTML structure even before full content load.
-const form = document.getElementById('preference-form');
-const fontsizeInput = document.getElementById('fontsize');
-const fontcolorInput = document.getElementById('fontcolor');
+
+// These variables will be defined inside the DOMContentLoaded handler
+let form, fontsizeInput, fontcolorInput;
 
 
 /**
@@ -60,18 +53,20 @@ function applyPreferences() {
 
     // Apply font size if cookie exists
     if (savedSize) {
-        // Set the CSS variable (needs 'px' unit)
         root.style.setProperty('--fontsize', savedSize + 'px'); 
-        // Update the form input to show the saved value
-        fontsizeInput.value = savedSize; 
+        // Only update input if it exists (which it will after DOMContentLoaded)
+        if (fontsizeInput) { 
+            fontsizeInput.value = savedSize; 
+        }
     }
 
     // Apply font color if cookie exists
     if (savedColor) {
-        // Set the CSS variable
         root.style.setProperty('--fontcolor', savedColor);
-        // Update the form input to show the saved value
-        fontcolorInput.value = savedColor;
+        // Only update input if it exists
+        if (fontcolorInput) {
+            fontcolorInput.value = savedColor;
+        }
     }
 }
 
@@ -84,15 +79,14 @@ function applyPreferences() {
 function handleSave(event) {
     event.preventDefault(); // Prevent the default form submission (page reload)
 
-    // Get validated values from inputs
     const size = fontsizeInput.value;
     const color = fontcolorInput.value;
 
-    // 1. Save preferences to cookies (valid for 30 days for persistence)
+    // 1. Save preferences to cookies
     setCookie('fontsize', size, 30);
     setCookie('fontcolor', color, 30);
 
-    // 2. Apply the changes immediately to the page for good User Experience (UX)
+    // 2. Apply the changes immediately to the page 
     root.style.setProperty('--fontsize', size + 'px');
     root.style.setProperty('--fontcolor', color);
 
@@ -103,8 +97,26 @@ function handleSave(event) {
 
 // --- 3. Initialization ---
 
-// 4️⃣ On Page Load: Apply any existing cookies first. This must run early.
-applyPreferences(); 
+// 4️⃣ Execute the necessary setup code AFTER the DOM is fully loaded.
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Get DOM elements here, where they are guaranteed to exist
+    form = document.getElementById('preference-form');
+    fontsizeInput = document.getElementById('fontsize');
+    fontcolorInput = document.getElementById('fontcolor');
 
-// Attach event listener to the form submission
-form.addEventListener('submit', handleSave);
+    // 2. Apply saved preferences
+    // NOTE: applyPreferences() is also called below the handler to set CSS variables early.
+    // We call it again here just to update the form inputs which are now available.
+    applyPreferences(); 
+    
+    // 3. Attach event listener (Line 110 fixed!)
+    if (form) {
+        form.addEventListener('submit', handleSave);
+    }
+});
+
+// CRUCIAL STEP: Call applyPreferences() outside the DOMContentLoaded listener
+// This ensures the CSS variables are set as early as possible (the original reason for moving the script to the head) 
+// to prevent the font-size check failure upon reload.
+// This call relies ONLY on document.documentElement (root) and getCookie, which are always available.
+applyPreferences();
