@@ -2,6 +2,7 @@
 // 🌐 APP LOGIC
 // ==============================
 
+// Cookie utilities
 function setCookie(name, value, days = 30) {
   const date = new Date();
   date.setTime(date.getTime() + days*24*60*60*1000);
@@ -18,6 +19,7 @@ function getCookie(name) {
   return null;
 }
 
+// Apply saved preferences
 function applyPreferences() {
   const size = getCookie("fontsize");
   const color = getCookie("fontcolor");
@@ -25,6 +27,7 @@ function applyPreferences() {
   if (color) document.documentElement.style.setProperty("--fontcolor", color);
 }
 
+// Apply as early as possible
 applyPreferences();
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -34,21 +37,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!form || !sizeInput || !colorInput) return;
 
-  // Initialize inputs with cookie values
+  // Initialize inputs from cookies
   if (getCookie("fontsize")) sizeInput.value = getCookie("fontsize");
   if (getCookie("fontcolor")) colorInput.value = getCookie("fontcolor");
 
-  // Save preferences on submit
+  // Save on submit
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const size = sizeInput.value;
     const color = colorInput.value;
 
-    // Save cookies with path=/
     setCookie("fontsize", size, 30);
     setCookie("fontcolor", color, 30);
 
-    // Apply immediately
     document.documentElement.style.setProperty("--fontsize", size + "px");
     document.documentElement.style.setProperty("--fontcolor", color);
   });
@@ -70,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==============================
 if (typeof describe !== "undefined") {
   describe("Font customization test", () => {
-    const baseUrl = "http://localhost:3000"; // adjust if needed
+    const baseUrl = "http://localhost:3000";
 
     it("should save and apply font size and color from cookies", () => {
       cy.visit(baseUrl + "/main.html");
@@ -82,10 +83,10 @@ if (typeof describe !== "undefined") {
       // Click Save
       cy.get("input[type='submit']").click();
 
-      // Wait for cookies to be set
-      cy.wait(200);
+      // Wait to ensure cookies are written
+      cy.wait(300);
 
-      // Ensure cookies exist
+      // Verify cookies exist
       cy.getCookie("fontsize").should("exist");
       cy.getCookie("fontcolor").should("exist");
 
@@ -93,7 +94,7 @@ if (typeof describe !== "undefined") {
       cy.reload();
       cy.wait(500);
 
-      // Verify applied styles
+      // Verify CSS
       cy.get("body")
         .should("have.css", "font-size")
         .and("match", /18px|18\.0px/);
