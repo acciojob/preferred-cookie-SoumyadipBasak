@@ -1,47 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Preferred Cookie: Customizable Font</title>
-    <link rel="stylesheet" href="./style.css" />
-    <script src="./script.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Font Settings</title>
 </head>
 <body>
-    <form id="preference-form">
-        <h2>Customize Page Font</h2>
+  <form id="settingsForm">
+    <label for="fontsize">Font Size (px):</label>
+    <input type="number" id="fontsize" name="fontsize" value="16" />
 
-        <label for="fontsize">Font Size (8–72px):</label>
-        <input
-            type="number"
-            id="fontsize"
-            name="fontsize"
-            min="8"
-            max="72"
-            value="16"
-        />
-        <br />
+    <label for="fontcolor">Font Color:</label>
+    <input type="color" id="fontcolor" name="fontcolor" value="#000000" />
 
-        <label for="fontcolor">Font Color:</label>
-        <input
-            type="color"
-            id="fontcolor"
-            name="fontcolor"
-            value="#000000"
-        />
-        <br />
+    <input type="submit" value="Apply" />
+  </form>
 
-        <input type="submit" value="Save" id="save-btn" />
-    </form>
+  <p>Sample text for testing.</p>
 
-    <hr />
-
-    <h1>Customizable Font Example</h1>
-    <p>
-        This paragraph demonstrates how your saved font size and color
-        preferences are remembered across page reloads using cookies.
-        Adjust the settings above and click "Save" to see your preferences
-        persist on your next visit!
-    </p>
+  <script src="main.js"></script>
 </body>
 </html>
